@@ -13,6 +13,113 @@ from vargrest.variogramdata.variogramdata import VariogramDataInterface
 
 
 def estimate_variogram_parameters(settings: Union[str, Dict], output_directory: str):
+    """
+    Estimate variogram parameters based on the provided parameters
+
+    # settings
+    File path to a json file or a dictionary containing estimation settings. All settings are optional except
+    data_file. In addition to these settings, advanced settings are described below.
+
+    - **data_file** File path to a ResQml model (.epc file)
+
+    - **cropbox** Dictionary describing the extent of the model to use for estimation. Specified by providing keys x_0,
+    x_1, y_0 and y_1 with float values. Delft3D models are typically starting at x=0, y=0.
+
+    - **archel** An integer providing an architectural element to filter on before doing estimation. Values from other
+    architectural elements will not contribute to the empirical variogram.
+
+    - **indicator** An integer providing an architectural element to do indicator kriging on.
+
+    - **net_to_gross** A floating point value in meters used to generate a custom indicator value based on median grain
+    size per cell. Net_to_gross provides a threshold such that diameter < net_to_gross will be used as an indicator for
+    producing sand. 0.088 is a reasonable testing value.
+
+    - **attribute_name** Name of the parameter to do variogram estimation. Should typically be porosity or permeability.
+    Default is to estimate porosity based on
+    TODO. Note that the estimate assumes certain parameters are available. This is mostly relevant for Delft3D models
+        pre-dating this project.
+
+    # output_directory
+    Directory to which output is written. The following files are written (relative to the provided directory):
+
+    - **settings.json** The settings used generate the output
+
+    - **summary.json** List of results with each entry containing variogram range, azimuth, parametric fit quality, etc,
+    as well as parameters identifying which settings were used. One list entry per execution (see multi-configuration
+    below). TODO: document each of the entries? In particular, is the quality factor documented elsewhere?
+
+    - **summary.csv**: Similar to summary.json, but on a text-based table format. Tecnically not CSV as space is used as
+    separator, not comma, and each column has a fixed width.
+
+    - **vargrest-output-<I>-_crop_.png** Image indicating the crop box used for execution <I>.
+
+    - **vargrest-output-<I>-_data_.pkl** Python pickle file containing some of the preliminary computation results,
+    including the full empirical variogram. This is primarily for debugging.
+
+    - **vargrest-output-<I>-_slices_.html** An html file showing the parameter values that the variogram is based on.
+    Shown layer-by-layer.
+
+    - **vargrest-output-<I>-_variogram_slices_.png** Slices of the empirical and parametric variograms along the X, Y
+    and Z axes. Gives an indication of the parametric fit beyond the quality factor provided by summary.json. Be aware
+    that the slices are along the coordinate axes, not the major, minor and vertical axes of the variogram ellipsoid.
+
+    - **vargrest-output-<I>-_variograms_2d_.png** 2D slices of the empirical and parametric variograms along the
+    coordinate axes. Anisotropic variograms that does not align with the coordinate axes, cannot be evaluated properly
+    in the figure above. A 2D slice can give a better indication of the parametric fit, as it also visualizes the
+    azimuth orientation.
+
+    # Multi-configuration execution
+    Some of the keywords can be provided as lists of values, as well as single values, and invoke multi-configuration
+    execution. The keywords that can be specified as lists are:
+    - Cropbox
+    - Archel
+    - Indicator
+    - Attribute_name
+    - Family
+
+    If one or more of these keywords are specified as lists, variogram estimates will be generated for all combinations
+    of input values. The output files summary.json and summary.csv will contain one entry per configuration. Moreover,
+    one set of quality assessment files (“vargrest-output-*”) are generated per configuration.
+
+    The main reason for doing multi-configuration execution is that results are gathered in a single folder and summary
+    files, making comparing results easier. Run time is not significantly better than doing single configuration
+    execution, as the empirical variogram must be re-computed for each configuration. Calculating the empirical
+    variogram is the time-consuming part. The exception is “family” which only relates to the parametric variogram, and
+    doing multi-configuration with multiple families of variograms will only do the empirical variogram estimation once.
+
+    # Advanced settings
+    The following settings are considered advanced in the vargrest package. It should not be necessary to adjust these
+    settings, but it can be useful to be aware of them:
+
+    - **Family** Name of the parametric variogram family to be estimated. Valid names are spherical, exponential,
+    gaussian and general_exponential. General_exponential is always estimated with a power of 1.5, even though the power
+    could in principle be estimated as well. Default is to estimate for all families.
+
+    - **Nugget** Boolean value (true/false) whether to estimate a nugget effect. Default is false.
+    TODO: argue why default is false, and perhaps discuss how this can affect estimation?
+
+    - **Lagmax** Maximum estimation range in number of cells. Specified as a dictionary with keys “x”, “y” and “z”. Can
+    be used to reduce run time if the crop box is large, but the variogram range is expected to be small. Default is
+    half the size of the crop box.
+
+    - **Sampling** Settings to control how sampling is done when estimating the empirical variogram. Specified as a
+    dictionary with a keyword “mode” and additional keywords depending the on the chosen mode. Three modes are
+    supported: dense, sparse and random. The main reason for choosing sparse or random is faster execution at the cost
+    of accuracy. However, accuracy has been more important than run time for version 1.0, and more effort has gone into
+    run-time optimization of the dense mode than the other two. Therefore, using other modes than dense may not yield
+    the expected run-time improvement.
+
+    - **Weighting** Dictionary with a single keyword, “sigma”, with a floating point value. When the parametric
+    variogram is fitted to the empirical variogram, all data points are given equal weight. However, the short-ranged
+    part of the variogram is often the most interesting. As the range increases, more datapoints become available for
+    fitting, which increases the emphasis on the distant part of the variogram, instead of the proximal part. To
+    accommodate for this, a gaussian kernel weight can be applied to reduce the weight of the distant point in the
+    variogram estimation. The sigma keyword specifies the range of the gaussian kernel in number of cells. Default is
+    sigma = 10.0. TODO: revise after the theory section is written.
+
+    - **Resample_dz** floating point value describing the resampling density in meters. Default is 0.25
+     TODO: revise after theory section is written. :
+    """
     if isinstance(settings, str):
         # Read settings from settings file
         settings = json.load(open(settings))
