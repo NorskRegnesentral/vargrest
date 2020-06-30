@@ -1,6 +1,5 @@
 import matplotlib.figure as mpl_f
 import numpy as np
-import variogram
 from vargrest.variogramestimation.parametricvariogram import VariogramType, AnisotropicVariogram
 from vargrest.variogramestimation.variogramestimation import ParametricVariogramEstimate, NonparametricVariogramEstimate
 
@@ -52,6 +51,7 @@ class SlicePlot:
         self._add_slices(par_v, '--', label=f'Param. ({pe.family.value})')
 
     def add_true_variogram(self, rx, ry, rz, azi, true_sd, data_sd):
+        import variogram
         # Simplification: only spherical used for now. Dip forced to 0.0.
         nx, ny, nz = self._shape
         dx, dy, dz = self._resolution
