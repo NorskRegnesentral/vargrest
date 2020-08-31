@@ -110,3 +110,7 @@ def dump_summaries_to_csv(summaries: List[ExecutionSummary], csv_file: str):
 
 def dump_summaries_to_json(summaries: List[ExecutionSummary], json_file: str):
     json.dump(summaries, open(json_file, 'w'), indent=2)
+    # Replace 'NaN' with 'null' to comply with JSON specification. This is not a bullet-proof replacement, but
+    # should not be a problem since we have full control of the content of the output file
+    new_jf = open(json_file, 'r').read().replace('NaN', 'null')
+    open(json_file, 'w').write(new_jf)
