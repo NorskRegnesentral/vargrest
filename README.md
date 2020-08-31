@@ -109,5 +109,7 @@ accommodate for this, a gaussian kernel weight can be applied to reduce the weig
 variogram estimation. The sigma keyword specifies the range of the gaussian kernel in number of cells. Default is
 sigma = 10.0.
 
-- **Resample_dz** floating point value describing the resampling density in meters. Resampling refers to the
+- **resample_dz** floating point value describing the resampling density in meters. Resampling refers to the
 pre-processing step which maps the Delft3D-based grid onto a lattice grid. Default is 0.25.
+
+- **full_qc** boolean flag to include full set of quality control data. Default is False.

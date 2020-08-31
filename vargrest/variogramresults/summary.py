@@ -53,15 +53,18 @@ def conclude(vd: VariogramDataInterface,
              ne: NonparametricVariogramEstimate,
              qc_dir: str,
              fn_template: str,
+             full_qc: bool
              ):
     # Save crop box figure to file
     vd.plot_crop_box(save_figure=True, dir_name=qc_dir, file_name=fn_template + "_crop_")
 
     # Pickle variogram estimation data
-    pickle.dump((ve, ne), open(os.path.join(qc_dir, fn_template + '_data_.pkl'), 'wb'))
+    if full_qc is True:
+        pickle.dump((ve, ne), open(os.path.join(qc_dir, fn_template + '_data_.pkl'), 'wb'))
 
     # Generate slice file
-    ve.generate_3d_slice_image(qc_dir, fn_template + '_slices_')
+    if full_qc is True:
+        ve.generate_3d_slice_image(qc_dir, fn_template + '_slices_')
 
     # Save variogram map plots to file
     dump_variogram_plot(ve, ne, pe, qc_dir, fn_template)

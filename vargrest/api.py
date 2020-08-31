@@ -116,8 +116,10 @@ def estimate_variogram_parameters(settings: Union[str, Dict], output_directory: 
     variogram estimation. The sigma keyword specifies the range of the gaussian kernel in number of cells. Default is
     sigma = 10.0.
 
-    - **Resample_dz** floating point value describing the resampling density in meters. Resampling refers to the
+    - **resample_dz** floating point value describing the resampling density in meters. Resampling refers to the
     pre-processing step which maps the Delft3D-based grid onto a lattice grid. Default is 0.25.
+
+    - **full_qc** boolean flag to include full set of quality control data. Default is False.
     """
     if isinstance(settings, str):
         # Read settings from settings file
@@ -134,6 +136,7 @@ def estimate_variogram_parameters(settings: Union[str, Dict], output_directory: 
     weighting = settings.get('weighting', {'sigma': 10.0})
     resample_dz = settings.get('resample_dz', 0.25)
     attribute_name = settings.get('attribute_name', 'Porosity')
+    full_qc = settings.get('full_qc', False)
 
     # Make sure output directory exists, and if not, make sure that it can be created
     os.makedirs(output_directory, exist_ok=True)
@@ -209,7 +212,7 @@ def estimate_variogram_parameters(settings: Union[str, Dict], output_directory: 
 
                 # Conclude estimation and dump results
                 i = len(results)
-                summary.conclude(rd, ve, pe, ne, output_directory, f'vargrest_output-{i}-')
+                summary.conclude(rd, ve, pe, ne, output_directory, f'vargrest_output-{i}-', full_qc)
                 md = {
                     summary.SummaryDataType.Identifier: i,
                     summary.SummaryDataType.Family: _fam.value,
