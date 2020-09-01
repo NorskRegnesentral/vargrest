@@ -71,12 +71,12 @@ execution. The keywords that can be specified as lists are:
 
 If one or more of these keywords are specified as lists, variogram estimates will be generated for all combinations
 of input values. The output files summary.json and summary.csv will contain one entry per configuration. Moreover,
-one set of quality assessment files (“vargrest-output-*”) are generated per configuration.
+one set of quality assessment files ("vargrest-output-*") are generated per configuration.
 
 The main reason for doing multi-configuration execution is that results are gathered in a single folder and summary
 files, making comparing results easier. Run time is not significantly better than doing single configuration
 execution, as the empirical variogram must be re-computed for each configuration. Calculating the empirical
-variogram is the time-consuming part. The exception is “family” which only relates to the parametric variogram, and
+variogram is the time-consuming part. The exception is "family" which only relates to the parametric variogram, and
 doing multi-configuration with multiple families of variograms will only do the empirical variogram estimation once.
 
 ### Advanced settings
@@ -90,18 +90,18 @@ power could in principle be estimated as well. Default is to estimate for all fa
 - **nugget** Boolean value (true/false) whether to estimate a nugget effect. Be aware that this might affect the
 stability in finding a parametric fit to the empirical variogram. Default is False.
 
-- **lagmax** Maximum estimation range in number of cells. Specified as a dictionary with keys “x”, “y” and “z”. Can
+- **lagmax** Maximum estimation range in number of cells. Specified as a dictionary with keys "x", "y" and "z". Can
 be used to reduce run time if the crop box is large, but the variogram range is expected to be small. Default is
 half the size of the crop box.
 
 - **sampling** Settings to control how sampling is done when estimating the empirical variogram. Specified as a
-dictionary with a keyword “mode” and additional keywords depending the on the chosen mode. Three modes are
+dictionary with a keyword "mode" and additional keywords depending the on the chosen mode. Three modes are
 supported: dense, sparse and random. The main reason for choosing sparse or random is faster execution at the cost
 of accuracy. However, accuracy has been more important than run time for version 1.0, and more effort has gone into
 run-time optimization of the dense mode than the other two. Therefore, using other modes than dense may not yield
 the expected run-time improvement. Default is to use dense sampling.
 
-- **weighting** Dictionary with a single keyword, “sigma”, with a floating point value. When the parametric
+- **weighting** Dictionary with a single keyword, "sigma", with a floating point value. When the parametric
 variogram is fitted to the empirical variogram, all data points are given equal weight. However, the proximal part
 of the variogram is often the most interesting. As the range increases, more datapoints become available for
 fitting, which increases the emphasis on the distant part of the variogram, instead of the proximal part. To
