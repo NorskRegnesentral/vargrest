@@ -23,9 +23,9 @@ architectural elements will not contribute to the empirical variogram.
 
 - **indicator** An integer providing an architectural element to do indicator kriging on.
 
-- **net_to_gross** A floating point value in meters used to generate a custom indicator value based on median grain
-size per cell. Net_to_gross provides a threshold such that diameter < net_to_gross will be used as an indicator for
-producing sand. 0.088 is a reasonable testing value.
+- **net_to_gross** A floating point value in millimeters used to generate a custom indicator value based on median
+grain size per cell. net_to_gross provides a threshold such that net_to_gross < diameter will be used as an
+indicator for producing sand. 0.088 is a reasonable testing value.
 
 - **attribute_name** Name of the parameter to do variogram estimation. Should typically be porosity or permeability.
 Default is to estimate porosity based on variables d50_per_sedclass and SedX_volfrac.
